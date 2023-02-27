@@ -8,23 +8,20 @@
     <title>To-Do-List</title>
 </head>
 <body>
-    <section class="todolist">
 
-        <h1 class="head">Zaplanuj swój czas</h1>
-        <div class="add-task">
-            <form>
-                <input type="search" placeholder="Napisz zadanie" id="input-task"/>
-                <button class="add-task-btn">Dodaj zadanie</button>
+    <section class="create-todo-list">
+        <h1 class="title">Zaplanuj swój czas</h1>
+            <form id="new-todolist-form">
+                <input type="text" placeholder="Napisz zadanie" id="input-task"/>
+                <button class="add-task-btn" type="submit">Dodaj zadanie</button>
             </form>
-        </div>
-        <div class="tasks">
-            <h2 class="head-tasks">Zadania</h2>
-            <ul class="list-task-ul">
-             
-            </ul>
-        </div>
-
     </section>
+
+        <section class="display-list-tasks">
+            <h2 class="head-tasks">Zadania</h2>
+            <div class="list" id="list-tasks"></div>
+        </section>
+    
     <script src="todo.js"></script>
 </body>
 </html>
