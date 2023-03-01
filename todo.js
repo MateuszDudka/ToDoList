@@ -1,50 +1,65 @@
 const addTaskBtn = document.querySelector(".add-task-btn");
 const inputTask = document.querySelector("#input-task");
-const listUl = document.querySelector(".list-task-ul");
+let listDiv = document.querySelector("#list-tasks");
 
-let todo = localStorage.getItem("todolist") | []; //tworze localstorage do przechowywawania zadań
+let todos = JSON.parse(localStorage.getItem("todolist")) || []; //tworze localstorage do przechowywawania zadań
 
-addTaskBtn.addEventListener("click", (e, index) => {
+addTaskBtn.addEventListener("click", (e) => {
   e.preventDefault(); //zatrzymuje odświeżanie
-  let array = []; // tworzę nową tablicę
-  array = JSON.parse(localStorage.getItem("todolist")) || []; //pobieram localstorage
-  let inputValue = inputTask.value; //przypisuje do zmiennej wprowadzaną wartość
-  //inputValue.setAttribute("index", `${index++}`);
-  array.push(inputValue); // wrzucam do localstorage(tablicy) wpisaną wartość
-  localStorage.setItem("todolist", JSON.stringify(array)); //zachowuje nową wartość w localstorage
+  const todo = {
+    content: inputTask.value,
+  };
+  todos.push(todo); // wrzucam do localstorage(tablicy) wpisaną wartość
+  localStorage.setItem("todolist", JSON.stringify(todos)); //zapisuje nową wartość w localstorage
+
   displayTask();
-});
+}); // dodawanie zadań do localstorage działa
 
 let displayTask = () => {
-  let toDoList = (array = JSON.parse(localStorage.getItem("todolist")) || []); //pobieram dane z localstorage
-  let liToDo = ""; //zeruje listę ul
-  //const li = createElement("li");
+  listDiv.innerHTML = "";
 
-  toDoList.forEach((element, index) => {
-    liToDo += `<li class="newIdLi"> ${element} <button id="edit" onClick="editTask()">Edytuj</button> <button>Usuń</button> </li> `;
-  }); //robię pętle po każdym elemencie localstorage i wyświetlam każdy element
-  listUl.innerHTML = liToDo; //przypisuje elementy do listy ul
-  inputTask.value = ""; //zeruje wartość w inpucie po dodaniu
+  todos.forEach((todo) => {
+    const taskItem = document.createElement("div");
+    taskItem.classList.add("task-item");
+
+    const content = document.createElement("div"); //tworze elemeny htmla
+    const actions = document.createElement("div");
+    const edit = document.createElement("button");
+    const deleteButton = document.createElement("button");
+
+    content.innerHTML = `<input type="text" value="${todo.content}" readonly>`;
+    edit.innerHTML = "Edytuj";
+    deleteButton.innerHTML = "Usuń";
+
+    content.classList.add("todo-content");
+    actions.classList.add("actions");
+    edit.classList.add("edit");
+    deleteButton.classList.add("delete"); //każde ma swoją klasę
+
+    actions.appendChild(edit);
+    actions.appendChild(deleteButton);
+    taskItem.appendChild(content);
+    taskItem.appendChild(actions); // wrzucam do htmla
+
+    listDiv.appendChild(taskItem);
+
+    edit.addEventListener("click", (e) => {
+      const input = content.querySelector("input"); //bo jest content.innerHTML = `input ......`
+      input.removeAttribute("readonly");
+      input.focus();
+      input.addEventListener("blur", (e) => {
+        input.setAttribute("readonly", true);
+        todo.content = e.target.value;
+        localStorage.setItem("todolist", JSON.stringify(todos));
+        displayTask();
+      });
+    });
+
+    deleteButton.addEventListener("click", (e) => {
+      todos = todos.filter((t) => t != todo);
+      localStorage.setItem("todolist", JSON.stringify(todos));
+      displayTask();
+    });
+  });
 };
-
-let displayToDo = displayTask();
-window.onload = displayToDo; //aby po załadowaniu strony(odświeżeniu strony) wyświetlały się zadania do zrobienia
-
-// let editTask = () => {
-//   const editBtn = document.getElementById("edit");
-//   const li = document.querySelector(".newIdLi");
-
-//   let toDoList = (array = JSON.parse(localStorage.getItem("todolist")) || []);
-
-//   toDoList.forEach((element) => {
-//     if (editBtn.textContent == "Edytuj") {
-//       editBtn.innerText = "Zapisz";
-//     } else {
-//       editBtn.innerText = "Edytuj";
-//     }
-//   });
-// };
-// editTask();
-
-//problem jest w tym że nie różnią się "id", czyli każde nowe zadanie ma takie samo id jakie pierwsze
-//czyli muszę zrobić coś aby przydzielać każdemu nowemu zadaniu przydzielać kolejne id (inkrementacja id(index++))
+displayTask();
